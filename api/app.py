@@ -5,16 +5,21 @@ import pandas as pd
 import numpy as np
 
 from audiModelFields import audiKeyFields
+from bmwModelFields import bmwKeyFields
+from vwModelFields import vwKeyFields
+from mercedesModelFields import mercedesKeyFields
 # creating the flask app
 app = Flask(__name__)
 # creating an API object
 api = Api(app)
 
-# importing models  
+# importing models
 
-modelDict = {
-    'Audi': pickle.load(open('audimodel.pickle', 'rb')),
-    # 'Volkswagen': pickle.load(open('volkswagenModel.pickle', 'rb'))
+resourcesDict = {
+    'Audi': [audiKeyFields, pickle.load(open('audiModel.pickle', 'rb'))],
+    'BMW': [bmwKeyFields, pickle.load(open('bmwModel.pickle', 'rb'))],
+    'Volkswagen': [vwKeyFields, pickle.load(open('vwModel.pickle', 'rb'))],
+    'Mercedes': [mercedesKeyFields, pickle.load(open('mercedesModel.pickle', 'rb'))]
 }
 car_post_args_parser = reqparse.RequestParser()
 car_post_args_parser.add_argument('manufacturer', type=str, help='Requires manufacturer')
@@ -28,7 +33,8 @@ car_post_args_parser.add_argument('engineSize', type=float, help='Requires engin
 def formatData(args):
     manufacturer = args['manufacturer']
     del args['manufacturer']
-    model = modelDict[manufacturer]
+    keyFields, model = resourcesDict[manufacturer]
+
     headersToFormat = ['model', 'transmission', 'fuelType']
     for header in headersToFormat:
         args[header] = 'dmy_' + args[header]
@@ -45,8 +51,8 @@ def formatData(args):
     # First for loop is for appending the non-dummy variables to the array
     for i in range(0, 3):
         finalInputData.append(input_data[i])
-    for i in range (3, len(audiKeyFields)):
-        if audiKeyFields[i] in input_data:
+    for i in range (3, len(keyFields)):
+        if keyFields[i] in input_data:
             finalInputData.append(1)
         else:
             finalInputData.append(0)
