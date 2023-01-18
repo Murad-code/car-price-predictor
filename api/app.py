@@ -3,11 +3,14 @@ from flask_restful import Resource, Api, reqparse
 import pickle
 import pandas as pd
 import numpy as np
+import sys
 
+sys.path.insert(0, './model-fields')
 from audiModelFields import audiKeyFields
 from bmwModelFields import bmwKeyFields
 from vwModelFields import vwKeyFields
 from mercedesModelFields import mercedesKeyFields
+
 # creating the flask app
 app = Flask(__name__)
 # creating an API object
@@ -16,10 +19,10 @@ api = Api(app)
 # importing models
 
 resourcesDict = {
-    'Audi': [audiKeyFields, pickle.load(open('audiModel.pickle', 'rb'))],
-    'BMW': [bmwKeyFields, pickle.load(open('bmwModel.pickle', 'rb'))],
-    'Volkswagen': [vwKeyFields, pickle.load(open('vwModel.pickle', 'rb'))],
-    'Mercedes': [mercedesKeyFields, pickle.load(open('mercedesModel.pickle', 'rb'))]
+    'Audi': [audiKeyFields, pickle.load(open('./models/audiModel.pickle', 'rb'))],
+    'BMW': [bmwKeyFields, pickle.load(open('./models/bmwModel.pickle', 'rb'))],
+    'Volkswagen': [vwKeyFields, pickle.load(open('./models/vwModel.pickle', 'rb'))],
+    'Mercedes': [mercedesKeyFields, pickle.load(open('./models/mercedesModel.pickle', 'rb'))]
 }
 car_post_args_parser = reqparse.RequestParser()
 car_post_args_parser.add_argument('manufacturer', type=str, help='Requires manufacturer')
