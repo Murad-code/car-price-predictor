@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
+import axios, { AxiosHeaders } from "axios";
 
 import {
   AudiModels,
@@ -23,7 +24,7 @@ const manufacturerToModelList: IManufacturerToModelList = {
   Volkswagen: VolkswagenModels,
 };
 
-interface FormData {
+interface IFormData {
   manufacturer: string;
   model: string;
   year: number;
@@ -33,22 +34,39 @@ interface FormData {
   transmission: string;
 }
 
-function Form() {
-  const [selectedManufacturer, setSelectedManufacturer] = useState("BMW");
-  const [data, setData] = useState();
+function Form({ setPrice, setData }) {
+  const [selectedManufacturer, setSelectedManufacturer] = useState("Audi");
   const {
     register,
-    setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
-  const onSubmit = handleSubmit((data) => console.log(21111, data));
+  } = useForm<IFormData>();
+  const onSubmit: SubmitHandler<IFormData> = async (data) => {
+    const formattedData = JSON.parse(
+      JSON.stringify(
+        data,
+        [
+          "manufacturer",
+          "year",
+          "mileage",
+          "engineSize",
+          "model",
+          "transmission",
+          "fuelType",
+        ],
+        4
+      )
+    );
+    const res = await axios.post("/api/price-prediction", formattedData);
+    setData({ id: "japan", color: "hsl(283, 70%, 50%)", data: res.data.data });
+    setPrice(res.data.data[0]);
+  };
 
   const manufacturerList: string[] = ["Audi", "BMW", "Mercedes", "Volkswagen"];
   const today = new Date();
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100 flex items-center justify-center">
+    <div className="min-h-[50%] p-4 bg-gray-100 flex items-center justify-center">
       <div className="container max-w-screen-lg mx-auto">
         <div>
           <h2 className="font-semibold text-xl text-gray-600">
@@ -58,19 +76,19 @@ function Form() {
             Fill in your vehicle's details below
           </p>
 
-          <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
+          <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-4">
             <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 lg:grid-cols-3">
               <div className="text-gray-600">
                 <p className="font-medium text-lg">Vehicle Details</p>
                 <p>Please fill out all the fields.</p>
               </div>
-              <form onSubmit={onSubmit}>
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="lg:col-span-2">
                   <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-5">
                     <div className="md:col-span-5">
                       <label>Manufacturer</label>
                       <select
-                        {...register("manufacturer")}
+                        {...register("manufacturer", { required: true })}
                         onChange={(e) =>
                           setSelectedManufacturer(e.target.value)
                         }
@@ -90,7 +108,7 @@ function Form() {
                     <div className="md:col-span-5">
                       <label>Model</label>
                       <select
-                        {...register("model")}
+                        {...register("model", { required: true })}
                         className="w-full p-2.5 text-gray-500 bg-gray-50 border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600"
                       >
                         {manufacturerToModelList[
@@ -105,10 +123,10 @@ function Form() {
 
                       <input
                         type="number"
-                        {...register("year")}
+                        {...register("year", { required: true })}
                         id="year"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
-                        min="1900"
+                        min={1900}
                         max={today.getFullYear()}
                       />
                     </div>
@@ -116,7 +134,9 @@ function Form() {
                       <label>Mileage</label>
                       <input
                         type="number"
-                        {...register("mileage")}
+                        {...register("mileage", {
+                          required: true,
+                        })}
                         id="mileage"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                         min="0"
@@ -126,7 +146,7 @@ function Form() {
                       <label>Engine Size</label>
                       <input
                         type="number"
-                        {...register("engineSize")}
+                        {...register("engineSize", { required: true })}
                         id="engineSize"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                         min="0"
@@ -135,7 +155,7 @@ function Form() {
                     <div className="md:col-span-5">
                       <label>Fuel Type</label>
                       <select
-                        {...register("fuelType")}
+                        {...register("fuelType", { required: true })}
                         className="w-full p-2.5 text-gray-500 bg-gray-50 border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600"
                       >
                         <>
@@ -148,7 +168,7 @@ function Form() {
                     <div className="md:col-span-5">
                       <label>Transmission</label>
                       <select
-                        {...register("transmission")}
+                        {...register("transmission", { required: true })}
                         className="w-full p-2.5 text-gray-500 bg-gray-50 border rounded-md shadow-sm outline-none appearance-none focus:border-indigo-600"
                       >
                         <>
@@ -164,7 +184,7 @@ function Form() {
                           type="submit"
                           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
-                          Submit
+                          Calculate Price
                         </button>
                       </div>
                     </div>
