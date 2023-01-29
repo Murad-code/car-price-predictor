@@ -53,12 +53,12 @@ def formatData(args):
         # Else, append 0 value to finalInputData array
     # First for loop is for appending the non-dummy variables to the array
     for i in range(0, 3):
-        finalInputData.append(input_data[i])
+        finalInputData.append(int(input_data[i]))
     for i in range (3, len(keyFields)):
         if keyFields[i] in input_data:
-            finalInputData.append(1)
+            finalInputData.append(int(1))
         else:
-            finalInputData.append(0)
+            finalInputData.append(int(0))
     data = np.array(finalInputData)
     data = [data]
     return model, data
@@ -73,9 +73,15 @@ class PredictPrice(Resource):
     def post(self):
         args = request.json
         model, data = formatData(args)
-        practice = model.predict(data)
-        practiceList = practice.tolist()
-        return jsonify({'data': practiceList})
+        year = data[0][0]
+        mileage = data[0][1]
+        resultList = []
+        for x in range(6):
+            tempData = data
+            tempData[0][0] = year - x
+            result = model.predict(tempData).tolist()
+            resultList = resultList + result
+        return jsonify({'data': resultList})
   
   
   
