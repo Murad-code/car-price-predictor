@@ -36,6 +36,8 @@ car_post_args_parser.add_argument('engineSize', type=float, help='Requires engin
 def formatData(args):
     manufacturer = args['manufacturer']
     del args['manufacturer']
+    annualMileage = args['annualMileage']
+    del args['annualMileage']
     keyFields, model = resourcesDict[manufacturer]
 
     headersToFormat = ['model', 'transmission', 'fuelType']
@@ -61,27 +63,33 @@ def formatData(args):
             finalInputData.append(int(0))
     data = np.array(finalInputData)
     data = [data]
-    return model, data
+    return model, data, annualMileage
+
+def processData(model, data, annualMileage):
+    resultList = []
+    year = data[0][0]
+
+    for x in range(6):
+        tempData = data
+        if x > 0:
+            tempData[0][1] = tempData[0][1] + annualMileage
+        tempData[0][0] = year - x
+        result = model.predict(tempData).tolist()
+        resultList = resultList + result
+    return resultList
 
 class PredictPrice(Resource):
   
     def get(self):
   
-        return jsonify({'message': 'hello world'})
+        return jsonify({'message': 'get request'})
   
     # Corresponds to POST request
     def post(self):
         args = request.json
-        model, data = formatData(args)
-        year = data[0][0]
-        mileage = data[0][1]
-        resultList = []
-        for x in range(6):
-            tempData = data
-            tempData[0][0] = year - x
-            result = model.predict(tempData).tolist()
-            resultList = resultList + result
-        return jsonify({'data': resultList})
+        model, data, annualMileage = formatData(args)
+        res = processData(model, data, annualMileage)
+        return jsonify({'data': res})
   
   
   
