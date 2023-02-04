@@ -4,6 +4,7 @@ import pickle
 import pandas as pd
 import numpy as np
 import sys
+from datetime import date
 
 sys.path.insert(0, './model-fields')
 from audiModelFields import audiKeyFields
@@ -32,11 +33,13 @@ car_post_args_parser.add_argument('mileage', type=int, help='Requires mileage')
 car_post_args_parser.add_argument('transmission', type=str, help='Requires transmission')
 car_post_args_parser.add_argument('fuelType', type=str, help='Requires fuelType')
 car_post_args_parser.add_argument('engineSize', type=float, help='Requires engineSize')
+car_post_args_parser.add_argument('annualMileage', type=int, help='Requires annualMileage')
+
 
 def formatData(args):
     manufacturer = args['manufacturer']
     del args['manufacturer']
-    annualMileage = args['annualMileage']
+    annualMileage = int(args['annualMileage'])
     del args['annualMileage']
     keyFields, model = resourcesDict[manufacturer]
 
@@ -51,7 +54,7 @@ def formatData(args):
     finalInputData = []
     # Loop through the KeyFieldsArray (e.g., audiKeyFields)
         # Each iteration check the keyfields array value and see if it exists inside the args array
-        # If it does exist, append 2 to finalInputData array
+        # If it does exist, append 1 to finalInputData array
         # Else, append 0 value to finalInputData array
     # First for loop is for appending the non-dummy variables to the array
     for i in range(0, 3):
@@ -74,8 +77,12 @@ def processData(model, data, annualMileage):
         if x > 0:
             tempData[0][1] = tempData[0][1] + annualMileage
         tempData[0][0] = year - x
-        result = model.predict(tempData).tolist()
-        resultList = resultList + result
+        price = model.predict(tempData).tolist()
+        result = {
+            "x": int(date.today().year + x),
+            "y": int(price[0])
+        }
+        resultList.append(result)
     return resultList
 
 class PredictPrice(Resource):

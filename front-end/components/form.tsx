@@ -1,7 +1,7 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import axios, { AxiosHeaders } from "axios";
+import axios from "axios";
 
 import {
   AudiModels,
@@ -32,9 +32,12 @@ interface IFormData {
   engineSize: number;
   fuelType: string;
   transmission: string;
+  annualMileage: number;
 }
 
-function Form({ setPrice, setData }) {
+const colours = ["#61cdbb", "#e8a838", "#f1e15b", "#f47560", "e8c1a0"];
+
+function Form({ setPrice, setData, data: existingData }) {
   const [selectedManufacturer, setSelectedManufacturer] = useState("Audi");
   const {
     register,
@@ -53,13 +56,26 @@ function Form({ setPrice, setData }) {
           "model",
           "transmission",
           "fuelType",
+          "annualMileage",
         ],
         4
       )
     );
     const res = await axios.post("/api/price-prediction", formattedData);
-    setData({ id: "japan", color: "hsl(283, 70%, 50%)", data: res.data.data });
-    setPrice(res.data.data[0]);
+    setData((e) => {
+      const { manufacturer, model, year } = formattedData;
+      const colour = colours.pop();
+      return [
+        ...e,
+        {
+          id: `${manufacturer} ${model}, ${year}`,
+          color: colour,
+          data: res.data.data,
+        },
+      ];
+    });
+
+    setPrice(res.data.data[0].y);
   };
 
   const manufacturerList: string[] = ["Audi", "BMW", "Mercedes", "Volkswagen"];
@@ -131,7 +147,7 @@ function Form({ setPrice, setData }) {
                       />
                     </div>
                     <div className="md:col-span-5">
-                      <label>Mileage</label>
+                      <label>Current Mileage</label>
                       <input
                         type="number"
                         {...register("mileage", {
@@ -140,6 +156,7 @@ function Form({ setPrice, setData }) {
                         id="mileage"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                         min="0"
+                        step="10000"
                       />
                     </div>
                     <div className="md:col-span-5">
@@ -177,14 +194,26 @@ function Form({ setPrice, setData }) {
                         </>
                       </select>
                     </div>
-
+                    <div className="md:col-span-5">
+                      <label>Annual Mileage?</label>
+                      <input
+                        type="number"
+                        {...register("annualMileage", {
+                          required: true,
+                        })}
+                        id="annualMileage"
+                        className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
+                        min="0"
+                        step="2000"
+                      />
+                    </div>
                     <div className="md:col-span-5 text-right">
                       <div className="inline-flex items-end">
                         <button
                           type="submit"
                           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
-                          Calculate Price
+                          View results
                         </button>
                       </div>
                     </div>
