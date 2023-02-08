@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ResponsiveLine } from "@nivo/line";
+import Modal from "./modal";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -7,19 +8,21 @@ import { ResponsiveLine } from "@nivo/line";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 
-function PriceChart({ data /* see data tab */ }) {
-  const [localData, setLocalData] = useState(data);
+function PriceChart({ data, chartData }) {
+  const [localData, setLocalData] = useState(chartData);
+  const [colourId, setColourId] = useState();
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    setLocalData(data);
-  }, [data]);
+    setLocalData(chartData);
+  }, [chartData]);
 
   return (
     <>
       <div className="p-6 bg-gray-100 flex items-center justify-center">
         <div className="container max-w-screen-lg mx-auto">
           <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
-            <div className="h-[600px] grid gap-4 gap-y-2 text-sm">
+            <div className="h-[600px] grid gap-4 gap-y-2 text-sm overflow-y-scroll">
               {/* <h1>test</h1> */}
               <ResponsiveLine
                 data={localData}
@@ -48,7 +51,7 @@ function PriceChart({ data /* see data tab */ }) {
                   tickPadding: 5,
                   tickRotation: 0,
                   legend: "Price",
-                  legendOffset: -40,
+                  legendOffset: -50,
                   legendPosition: "middle",
                 }}
                 pointSize={10}
@@ -62,11 +65,11 @@ function PriceChart({ data /* see data tab */ }) {
                     anchor: "bottom-right",
                     direction: "column",
                     justify: false,
-                    translateX: 100,
+                    translateX: 140,
                     translateY: 0,
                     itemsSpacing: 0,
                     itemDirection: "left-to-right",
-                    itemWidth: 80,
+                    itemWidth: 120,
                     itemHeight: 20,
                     itemOpacity: 0.75,
                     symbolSize: 12,
@@ -81,6 +84,11 @@ function PriceChart({ data /* see data tab */ }) {
                         },
                       },
                     ],
+                    onClick: (e) => {
+                      console.log(15555, e);
+                      setColourId(e.color);
+                      setShowModal(true);
+                    },
                   },
                 ]}
               />
@@ -88,6 +96,13 @@ function PriceChart({ data /* see data tab */ }) {
           </div>
         </div>
       </div>
+      {showModal && (
+        <Modal
+          carData={data}
+          colourId={colourId}
+          closeModal={() => setShowModal(false)}
+        />
+      )}
     </>
   );
 }

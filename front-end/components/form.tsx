@@ -35,9 +35,9 @@ interface IFormData {
   annualMileage: number;
 }
 
-const colours = ["#61cdbb", "#e8a838", "#f1e15b", "#f47560", "e8c1a0"];
+const colours = ["#61cdbb", "#e8a838", "#f1e15b", "#f47560", "#e8c1a0"];
 
-function Form({ setPrice, setData, data: existingData }) {
+function Form({ setPrice, setData, setChartData }) {
   const [selectedManufacturer, setSelectedManufacturer] = useState("Audi");
   const {
     register,
@@ -62,14 +62,21 @@ function Form({ setPrice, setData, data: existingData }) {
       )
     );
     const res = await axios.post("/api/price-prediction", formattedData);
-    setData((e) => {
+    const colourId = colours.pop();
+    formattedData.colourId = colourId;
+    setData((e) => [...e, formattedData]);
+    setChartData((e) => {
       const { manufacturer, model, year } = formattedData;
-      const colour = colours.pop();
+      const max = 1000;
+      const min = 1;
+      const rand = min + Math.random() * (max - min);
+      console.log(1222, res.data.data);
       return [
         ...e,
         {
           id: `${manufacturer} ${model}, ${year}`,
-          color: colour,
+          label: "test",
+          color: colourId,
           data: res.data.data,
         },
       ];
@@ -156,7 +163,6 @@ function Form({ setPrice, setData, data: existingData }) {
                         id="mileage"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                         min="0"
-                        step="10000"
                       />
                     </div>
                     <div className="md:col-span-5">
@@ -204,7 +210,6 @@ function Form({ setPrice, setData, data: existingData }) {
                         id="annualMileage"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                         min="0"
-                        step="2000"
                       />
                     </div>
                     <div className="md:col-span-5 text-right">
