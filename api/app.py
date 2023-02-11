@@ -57,8 +57,9 @@ def formatData(args):
         # If it does exist, append 1 to finalInputData array
         # Else, append 0 value to finalInputData array
     # First for loop is for appending the non-dummy variables to the array
-    for i in range(0, 3):
+    for i in range(0, 2):
         finalInputData.append(int(input_data[i]))
+    finalInputData.append(float(input_data[2]))
     for i in range (3, len(keyFields)):
         if keyFields[i] in input_data:
             finalInputData.append(int(1))
