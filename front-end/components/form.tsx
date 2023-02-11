@@ -189,6 +189,7 @@ function Form({ setPrice }) {
                         id="engineSize"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                         min="0"
+                        step="0.1"
                       />
                     </div>
                     <div className="md:col-span-5">
