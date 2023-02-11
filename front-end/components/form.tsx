@@ -1,7 +1,9 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from "axios";
+import { DataContext } from "../context/dataContext";
+import { ICarData, IDataContextType } from "../@types/data";
 
 import {
   AudiModels,
@@ -9,6 +11,7 @@ import {
   MercedesModels,
   VolkswagenModels,
 } from "../lib/models";
+import { Serie } from "@nivo/line";
 
 interface IManufacturerToModelList {
   Audi: string[];
@@ -37,13 +40,16 @@ interface IFormData {
 
 const colours = ["#61cdbb", "#e8a838", "#f1e15b", "#f47560", "#e8c1a0"];
 
-function Form({ setPrice, setData, setChartData }) {
+function Form({ setPrice }) {
   const [selectedManufacturer, setSelectedManufacturer] = useState("Audi");
+  const { setData, setChartData } = useContext(DataContext) as IDataContextType;
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<IFormData>();
+
   const onSubmit: SubmitHandler<IFormData> = async (data) => {
     const formattedData = JSON.parse(
       JSON.stringify(
@@ -64,22 +70,32 @@ function Form({ setPrice, setData, setChartData }) {
     const res = await axios.post("/api/price-prediction", formattedData);
     const colourId = colours.pop();
     formattedData.colourId = colourId;
-    setData((e) => [...e, formattedData]);
-    setChartData((e) => {
+    setData((current: ICarData[]) =>
+      current ? [...current, formattedData] : [formattedData]
+    );
+    setChartData((current: Serie[]) => {
       const { manufacturer, model, year } = formattedData;
       const max = 1000;
       const min = 1;
       const rand = min + Math.random() * (max - min);
-      console.log(1222, res.data.data);
-      return [
-        ...e,
-        {
-          id: `${manufacturer} ${model}, ${year}`,
-          label: "test",
-          color: colourId,
-          data: res.data.data,
-        },
-      ];
+      return current
+        ? [
+            ...current,
+            {
+              id: `${manufacturer} ${model}, ${year}`,
+              label: "test",
+              color: colourId,
+              data: res.data.data,
+            },
+          ]
+        : [
+            {
+              id: `${manufacturer} ${model}, ${year}`,
+              label: "test",
+              color: colourId,
+              data: res.data.data,
+            },
+          ];
     });
 
     setPrice(res.data.data[0].y);

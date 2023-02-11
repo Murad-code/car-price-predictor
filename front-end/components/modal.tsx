@@ -1,10 +1,15 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, useContext } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { DataContext } from "../context/dataContext";
+import { IDataContextType } from "../@types/data";
 
-export default function Modal({ carData, colourId, closeModal }) {
+export default function Modal({ colourId, closeModal }) {
+  const { data, removeData } = useContext(DataContext) as IDataContextType;
+
   const cancelButtonRef = useRef(null);
-  const modalInfo = carData.find((x) => x.colourId === colourId);
+  const modalInfo = data?.find((x) => x.colourId === colourId);
+
   return (
     <Transition.Root show={true} as={Fragment}>
       <Dialog
@@ -55,14 +60,14 @@ export default function Modal({ carData, colourId, closeModal }) {
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
                           <ul>
-                            <li>Manufacturer: {modalInfo.manufacturer}</li>
-                            <li>Model: {modalInfo.model}</li>
-                            <li>Year: {modalInfo.year}</li>
-                            <li>Mileage: {modalInfo.mileage}</li>
-                            <li>Engine size: {modalInfo.engineSize}</li>
-                            <li>Transmission {modalInfo.transmission}</li>
-                            <li>Fuel type: {modalInfo.fuelType}</li>
-                            <li>Annual Mileage: {modalInfo.annualMileage}</li>
+                            <li>Manufacturer: {modalInfo?.manufacturer}</li>
+                            <li>Model: {modalInfo?.model}</li>
+                            <li>Year: {modalInfo?.year}</li>
+                            <li>Mileage: {modalInfo?.mileage}</li>
+                            <li>Engine size: {modalInfo?.engineSize}</li>
+                            <li>Transmission {modalInfo?.transmission}</li>
+                            <li>Fuel type: {modalInfo?.fuelType}</li>
+                            <li>Annual Mileage: {modalInfo?.annualMileage}</li>
                           </ul>
                         </p>
                       </div>
@@ -75,6 +80,7 @@ export default function Modal({ carData, colourId, closeModal }) {
                     className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={() => {
                       closeModal();
+                      modalInfo ? removeData(modalInfo) : null;
                     }}
                   >
                     Remove
