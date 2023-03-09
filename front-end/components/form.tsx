@@ -10,7 +10,7 @@ import {
   BMWModels,
   MercedesModels,
   VolkswagenModels,
-} from "../lib/models";
+} from "./models";
 import { Serie } from "@nivo/line";
 
 interface IManufacturerToModelList {
