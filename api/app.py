@@ -42,19 +42,20 @@ def formatData(args):
     for header in headersToFormat:
         args[header] = 'dmy_' + args[header]
    
-    # Potential Solution:
     # Convert the args (input data) into an array using only the args values
     input_data = list(args.values())
     # Create empty array (finalInputData) for input data to pass into the model
     finalInputData = []
-    # Loop through the KeyFieldsArray (e.g., audiKeyFields)
-        # Each iteration check the keyfields array value and see if it exists inside the args array
-        # If it does exist, append 1 to finalInputData array
-        # Else, append 0 value to finalInputData array
-    # First for loop is for appending the non-dummy variables to the array
+
+    # This for loop is for appending the non-dummy variables to the array
     for i in range(0, 2):
         finalInputData.append(int(input_data[i]))
-    finalInputData.append(float(input_data[2]))
+    finalInputData.append(float(input_data[2])) # This is the engineSize decimal value hence why it's converted to float type
+
+    # Loop through the KeyFieldsArray (e.g., audiKeyFields)
+    # Each iteration check the keyfields array value and see if it exists inside the args array
+    # If it does exist, append 1 to finalInputData array
+    # Else, append 0 value to finalInputData array
     for i in range (3, len(keyFields)):
         if keyFields[i] in input_data:
             finalInputData.append(int(1))
