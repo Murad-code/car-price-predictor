@@ -233,7 +233,7 @@ function Form({ setPrice }) {
                       <div className="inline-flex items-end">
                         <button
                           type="submit"
-                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                          className="bg-[#0070C0] hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
                           View results
                         </button>

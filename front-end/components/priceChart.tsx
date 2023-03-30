@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import Modal from "./modal";
 import { DataContext } from "../context/dataContext";
@@ -8,12 +8,23 @@ function PriceChart() {
   const [colourId, setColourId] = useState<string>();
   const [showModal, setShowModal] = useState(false);
   const { chartData } = useContext(DataContext) as IDataContextType;
+  const myRef = useRef<HTMLDivElement>(null); // Create a ref for the component you want to scroll to
+
+  useEffect(() => {
+    if (myRef.current !== null) {
+      // Add a conditional check to make sure myRef.current is not null
+      myRef.current.scrollIntoView({ behavior: "smooth" }); // Use the scrollIntoView method to scroll to the component
+    }
+  }, [chartData]);
 
   return (
     chartData &&
     chartData.length !== 0 && (
       <>
-        <div className="p-6 bg-gray-100 flex items-center justify-center">
+        <div
+          ref={myRef}
+          className="p-6 bg-gray-100 flex items-center justify-center"
+        >
           <div className="container max-w-screen-lg mx-auto">
             <div className="bg-white rounded shadow-lg p-4 px-2 md:p-8 mb-6">
               <div className="h-[600px] grid gap-4 gap-y-2 text-sm overflow-y-scroll">
