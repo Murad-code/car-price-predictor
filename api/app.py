@@ -12,11 +12,6 @@ from bmwModelFields import bmwKeyFields
 from vwModelFields import vwKeyFields
 from mercedesModelFields import mercedesKeyFields
 
-# creating the flask app
-app = Flask(__name__)
-# creating an API object
-api = Api(app)
-
 # importing models
 
 resourcesDict = {
@@ -86,11 +81,13 @@ def processData(model, data, annualMileage):
         resultList.append(result)
     return resultList
 
+
+# creating the flask app
+app = Flask(__name__)
+# creating an API object
+api = Api(app)
+
 class PredictPrice(Resource):
-  
-    def get(self):
-  
-        return jsonify({'message': 'get request'})
   
     # Corresponds to POST request
     def post(self):
